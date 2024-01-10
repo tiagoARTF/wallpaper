@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Axioma Wallpaper 4k</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">hola fragmento en blanco</string>
+    <string name="hello" >Hola</string>
+    <string name="trending">Tendencias</string>
+    <string name="category">Categoria</string>
+    <string name="fav">Favoritos</string>
+    <string name="downloads">Descargas</string>
+    <string name="settings">Ajustes</string>
+    <string name="set_as">Establecer como fondo de pantalla</string>
+    <string name="set_as_home">Establecer como fondo de pantalla de inicio</string>
+    <string name="lock">Establecer como fondo de pantalla de bloqueo</string>
+    <string name="currently">Actualmente no hay descargas</string>
+    <string name="currently1">Actualmente no hay favoritos</string>
+    <string name="clearfav">Borrar favoritos</string>
+    <string name="clearDownl">Borrar Descargas</string>
+    <string name="clear_data">Borrar datos de la aplicación"</string>
+    <string name="cache">Caché total de la app</string>
+
+</resources>

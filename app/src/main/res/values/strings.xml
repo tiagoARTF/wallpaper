@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Axioma Wallpaper 4k</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello">Hello</string>
+    <string name="trending">Trending</string>
+    <string name="category">Category</string>
+    <string name="fav">Fav</string>
+    <string name="downloads">Downloads</string>
+    <string name="settings">Settings</string>
+    <string name="set_as">Set as Wallpaper</string>
+    <string name="set_as_home">Set as Home Screen Wallpaper</string>
+    <string name="lock">Set as Lock Screen Wallpaper</string>
+    <string name="currently">Currently No Downloads</string>
+    <string name="currently1">Currently No Favourites</string>
+    <string name="clearfav">Clear Favorites</string>
+    <string name="clearDownl">Clear Downloads</string>
+    <string name="clear_data">Clear App Data"</string>
+    <string name="cache">Total App Cache</string>
+</resources>

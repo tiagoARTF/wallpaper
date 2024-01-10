@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "663904265361",
+    "project_id": "wallpaper-f40b6",
+    "storage_bucket": "wallpaper-f40b6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663904265361:android:4b0016cd473951391acb30",
+        "android_client_info": {
+          "package_name": "com.axioma.wallpapers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV6Cos4mhtzZB32zjLdtOMYd82rR1IYZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663904265361:android:b7861ebd648cda7b1acb30",
+        "android_client_info": {
+          "package_name": "com.example.concesionario_jueves"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV6Cos4mhtzZB32zjLdtOMYd82rR1IYZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663904265361:android:b3d069acb96ec4db1acb30",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV6Cos4mhtzZB32zjLdtOMYd82rR1IYZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
