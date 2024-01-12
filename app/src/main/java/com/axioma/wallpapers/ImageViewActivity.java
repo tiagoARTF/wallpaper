@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -26,28 +27,44 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImageViewActivity extends AppCompatActivity {
+
+
+
+    private InterstitialAd mInterstitialAd;
+
+
+    Button wallpaper;
+
     int position;
     ImageButton shareBtn, downloadBtn, favBtn, rotateBtn;
 
     Button wallpaperBtn;
+
+
     ArrayList<String> imageUrls;
     String imageUrl;
     private SharedPreferences favSharedPreferences;
@@ -57,21 +74,10 @@ public class ImageViewActivity extends AppCompatActivity {
     private float scaleFactor = 1.0f;
     private GestureDetector gestureDetector;
 
-    private AdView mAdView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-//        }
-//
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-//        }
         setContentView(R.layout.activity_image_view);
-
-
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
@@ -79,54 +85,23 @@ public class ImageViewActivity extends AppCompatActivity {
             }
         });
 
-        mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        LoadInterstitialAd();
 
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-            }
+        wallpaper = findViewById(R.id.wallpaper);
 
+        wallpaper.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-                // Code to be executed when an ad request fails.
-            }
-
-            @Override
-            public void onAdImpression() {
-                // Code to be executed when an impression is recorded
-                // for an ad.
-            }
-
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
+            public void onClick(View v) {
+                showInterstitial();
             }
         });
 
-
-// Hide the status bar
+        // Hide the status bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().getInsetsController().hide(WindowInsets.Type.statusBars());
         } else {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-
-
 
         imageUrls = getIntent().getStringArrayListExtra("image_url_list");
         imageUrl = getIntent().getStringExtra("image_url");
@@ -142,13 +117,8 @@ public class ImageViewActivity extends AppCompatActivity {
         downloadBtn = findViewById(R.id.download);
         favBtn = findViewById(R.id.favBtn);
         wallpaperBtn = findViewById(R.id.wallpaper);
-//        rotateBtn = findViewById(R.id.rotateBtn);
-
-
-//        rotateBtn.setOnClickListener(v -> rotateImage());
 
         favBtn.setOnClickListener(v -> {
-//                favBtn.setBackgroundResource(R.drawable.unfavourite);
             String imageUrl = getIntent().getStringExtra("image_url");
             storeImageUrlFav(imageUrl, v);
             Toast.makeText(getApplicationContext(), "Added as Favourites", Toast.LENGTH_SHORT).show();
@@ -212,7 +182,7 @@ public class ImageViewActivity extends AppCompatActivity {
                             } else {
                                 int progress = (int) ((downloadedBytes * 100L) / totalBytes);
                                 progressBar.setProgress(progress);
-                                progressText.setText("Downloading ..." +progress + "%");
+                                progressText.setText("Downloading ..." + progress + "%");
 
                                 // Check progress again after a delay
                                 handler.postDelayed(this, 20);
@@ -226,8 +196,6 @@ public class ImageViewActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Failed to download image", Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
         downloadBtn.setOnClickListener(v -> downloadImage());
         shareBtn.setOnClickListener(v -> {
@@ -262,16 +230,72 @@ public class ImageViewActivity extends AppCompatActivity {
             }, 5000);
             shareImage(file);
         });
-//        TextView nameTextView = findViewById(R.id.imageNameTextView);
 
-
-//        Glide.with(this)
-//                .load(imageUrl)
-//                .into(imageView);
-
-//        nameTextView.setText(imageName);
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
     }
+
+    private void showInterstitial() {
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(ImageViewActivity.this);
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+    }
+
+    private void LoadInterstitialAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        mInterstitialAd = interstitialAd;
+
+                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdClicked() {
+                                // Called when a click is recorded for an ad.
+                                // Log.d(TAG, "Ad was clicked.");
+                            }
+
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                // Called when ad is dismissed.
+                                // Set the ad reference to null so you don't show the ad a second time.
+                                // Log.d(TAG, "Ad dismissed fullscreen content.");
+                                mInterstitialAd = null;
+                                LoadInterstitialAd();
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                // Called when ad fails to show.
+                                Log.e("TAG", "Ad failed to show fullscreen content.");
+                                mInterstitialAd = null;
+                            }
+
+                            @Override
+                            public void onAdImpression() {
+                                // Called when an impression is recorded for an ad.
+                                // Log.d(TAG, "Ad recorded an impression.");
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                // Called when ad is shown.
+                                // Log.d(TAG, "Ad showed fullscreen content.");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        mInterstitialAd = null;
+                        Log.d("TAG", loadAdError.toString());
+                    }
+                });
+    }
+
 
 
     @Override
@@ -559,4 +583,6 @@ public class ImageViewActivity extends AppCompatActivity {
             return super.onFling(e1, e2, velocityX, velocityY);
         }
     }
+
+
 }
